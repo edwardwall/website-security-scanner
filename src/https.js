@@ -18,6 +18,33 @@ function upgradeToHttps(chain) {
 }
 
 
+/**
+ * Test whether the server maintains a secure connection.
+ *
+ * @param {URL[]} chain
+ */
+function secureRedirectionChain(chain) {
+
+    if ("http:" === chain[0].protocol) {
+        throw "First URL should be HTTPS";
+    }
+
+    let secure = true;
+
+    for (url of chain) {
+
+        if ("https:" != url.protocol) {
+            secure = false;
+        }
+
+    }
+
+    return secure;
+
+}
+
+
 module.exports = {
-    upgradeToHttps
+    upgradeToHttps,
+    secureRedirectionChain
 };
