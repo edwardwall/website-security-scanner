@@ -1,4 +1,30 @@
 const HTTP = require("../src/http.js");
+const GENERIC = require("../src/generic.js");
+
+
+describe("Check xContentTypeOptions()", () => {
+
+    test("invalid headers", () => {
+
+        expect(HTTP.xContentTypeOptions(undefined))
+            .toEqual(GENERIC.INVALID_RESULT);
+
+        expect(HTTP.xContentTypeOptions(""))
+            .toEqual(GENERIC.INVALID_RESULT);
+
+        expect(HTTP.xContentTypeOptions("no sniff"))
+            .toEqual(GENERIC.INVALID_RESULT);
+
+    });
+
+    test("valid headers", () => {
+
+        expect(HTTP.xContentTypeOptions("nosniff"))
+            .toEqual(GENERIC.VALID_RESULT);
+
+    });
+
+});
 
 
 describe("Check xXssProtectionHeader()", () => {
@@ -46,7 +72,6 @@ describe("Check xXssProtectionHeader()", () => {
                     block:true
                 }
             });
-
 
     });
 
