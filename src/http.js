@@ -20,6 +20,35 @@ function xContentTypeOptions(header) {
 
 
 /**
+ * Check X-Frame-Options header.
+ */
+function xFrameOptions(header) {
+
+    if (undefined == header) {
+        return GENERIC.INVALID_RESULT;
+    }
+
+    header = header.toLowerCase().trim();
+    let valid = false;
+
+    for (directive of header.split(";")) {
+        if ("deny" === directive ||
+            "sameorigin" === directive) {
+
+            valid = true;
+        }
+    }
+
+    if (valid) {
+        return GENERIC.VALID_RESULT;
+    } else {
+        return GENERIC.INVALID_RESULT;
+    }
+
+}
+
+
+/**
  * Check X-XSS-Protection HTTP header.
  *
  * @param {string} header
@@ -55,5 +84,6 @@ function xXssProtectionHeader(header) {
 
 module.exports = {
     xContentTypeOptions,
+    xFrameOptions,
     xXssProtectionHeader
 }

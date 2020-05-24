@@ -27,6 +27,34 @@ describe("Check xContentTypeOptions()", () => {
 });
 
 
+describe("Check xFrameOptions()", () => {
+
+    test("invalid headers", () => {
+
+        expect(HTTP.xFrameOptions(undefined))
+            .toEqual(GENERIC.INVALID_RESULT);
+
+        expect(HTTP.xFrameOptions(""))
+            .toEqual(GENERIC.INVALID_RESULT);
+
+    });
+
+    test("valid headers", () => {
+
+        expect(HTTP.xFrameOptions("deny"))
+            .toEqual(GENERIC.VALID_RESULT);
+
+        expect(HTTP.xFrameOptions("sameorigin"))
+            .toEqual(GENERIC.VALID_RESULT);
+
+        expect(HTTP.xFrameOptions("SAMEORIGIN"))
+            .toEqual(GENERIC.VALID_RESULT);
+
+    });
+
+});
+
+
 describe("Check xXssProtectionHeader()", () => {
 
     test("invalid headers", () => {
