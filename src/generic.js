@@ -22,6 +22,47 @@ async function get(url, callback) {
 }
 
 
+/**
+ * Search through header for properly formed key=value pair.
+ *
+ * @param {string} header
+ * @param {string} key
+ * @param {string} value
+ */
+function checkHeaderKeyValue(header, key, value) {
+
+    key = key.toLowerCase();
+    value = value.toLowerCase();
+
+    header = header.toLowerCase().split(";");
+    let found = false;
+
+    for (directive of header) {
+
+        directive = directive.trim();
+
+        if (!directive.startsWith(key)) {
+            continue;
+        }
+        directive = directive.substring(key.length).trim();
+
+        if (!directive.startsWith("=")) {
+            continue;
+        }
+        directive = directive.substring("=".length).trim() + " ";
+
+        if (directive.startsWith(value + " ")) {
+            found = true;
+        }
+
+    }
+
+    return found;
+
+}
+
+
 module.exports = {
-    get
+    get,
+    checkHeaderKeyValue
 };
