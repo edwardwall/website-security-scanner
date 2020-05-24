@@ -39,3 +39,31 @@ describe("Check checkHeaderKeyValue()", () => {
     });
 
 });
+
+
+describe("Check parsePolicy()", () => {
+
+    test("malformed policies", () => {
+
+        expect(() => {
+            GENERIC.parsePolicy(undefined)
+        }).toThrow();
+
+    });
+
+    test("valid policies", () => {
+
+        expect(GENERIC.parsePolicy("example1 'unsafe' *; example2 http:"))
+            .toEqual({
+                example1:[
+                    "'unsafe'",
+                    "*"
+                ],
+                example2:[
+                    "http:"
+                ]
+            });
+
+    });
+
+});

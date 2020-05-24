@@ -65,9 +65,39 @@ function checkHeaderKeyValue(header, key, value) {
 }
 
 
+/**
+ * Parse a policy (CSP or Feature).
+ *
+ * @param {string} policy
+ */
+function parsePolicy(policy) {
+
+    if (undefined === policy) {
+        throw "Policy is undefined";
+    }
+
+    let result = {};
+
+    for (section of policy.toLowerCase().split(";")) {
+
+        section = section.trim();
+
+        let directive = section.substring(0, section.indexOf(" "));
+        section = section.substring(section.indexOf(" ") + 1);
+
+        result[directive] = section.split(" ");
+
+    }
+
+    return result;
+
+}
+
+
 module.exports = {
     INVALID_RESULT,
     VALID_RESULT,
     get,
-    checkHeaderKeyValue
+    checkHeaderKeyValue,
+    parsePolicy
 };
