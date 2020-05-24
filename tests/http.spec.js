@@ -31,19 +31,17 @@ describe("Check xXssProtectionHeader()", () => {
 
     test("invalid headers", () => {
 
-        const OUTPUT = {result:false};
-
         expect(HTTP.xXssProtectionHeader(undefined))
-            .toEqual(OUTPUT);
+            .toEqual(GENERIC.INVALID_RESULT);
 
         expect(HTTP.xXssProtectionHeader(""))
-            .toEqual(OUTPUT);
+            .toEqual(GENERIC.INVALID_RESULT);
 
         expect(HTTP.xXssProtectionHeader("0"))
-            .toEqual(OUTPUT);
+            .toEqual(GENERIC.INVALID_RESULT);
 
         expect(HTTP.xXssProtectionHeader("0;mode=block"))
-            .toEqual(OUTPUT);
+            .toEqual(GENERIC.INVALID_RESULT);
 
     });
 

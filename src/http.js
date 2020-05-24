@@ -26,10 +26,8 @@ function xContentTypeOptions(header) {
  */
 function xXssProtectionHeader(header) {
 
-    const INVALID = {result:false};
-
     if (undefined === header) {
-        return INVALID;
+        return GENERIC.INVALID_RESULT;
     }
 
     header = header.toLowerCase();
@@ -42,7 +40,7 @@ function xXssProtectionHeader(header) {
     }
 
     if (!valid) {
-        return INVALID;
+        return GENERIC.INVALID_RESULT;
     }
 
     return {
