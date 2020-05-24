@@ -1,3 +1,6 @@
+const GENERIC = require("./generic.js");
+
+
 /**
  * Test whether the server immediately upgrades to HTTPS.
  *
@@ -6,14 +9,18 @@
 function upgradeToHttps(chain) {
 
     if (2 > chain.length) {
-        return false; // chain must be at least 2 elements long
+        return GENERIC.INVALID_RESULT;
     }
 
     if ("https:" === chain[0].protocol) {
         throw "First URL should be HTTP";
     }
 
-    return ("https:" === chain[1].protocol);
+    if ("https:" === chain[1].protocol) {
+        return GENERIC.VALID_RESULT;
+    } else {
+        return GENERIC.INVALID_RESULT;
+    }
 
 }
 
@@ -39,7 +46,11 @@ function secureRedirectionChain(chain) {
 
     }
 
-    return secure;
+    if (secure) {
+        return GENERIC.VALID_RESULT;
+    } else {
+        return GENERIC.INVALID_RESULT;
+    }
 
 }
 
@@ -51,10 +62,8 @@ function secureRedirectionChain(chain) {
  */
 function httpStrictTransportSecurity(header) {
 
-    const INVALID = {result:false};
-
     if (undefined === header) {
-        return INVALID;
+        return GENERIC.INVALID_RESULT;
     }
 
     header = header.toLowerCase().split(";");
@@ -83,7 +92,7 @@ function httpStrictTransportSecurity(header) {
     }
 
     if (!(0 < age)) {
-        return INVALID;
+        return GENERIC.INVALID_RESULT;
     }
 
     return {

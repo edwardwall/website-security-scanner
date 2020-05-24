@@ -1,4 +1,6 @@
 const HTTPS = require("../src/https.js")
+const GENERIC = require("../src/generic.js");
+
 
 describe("Check upgradeToHttps()", () => {
 
@@ -6,11 +8,11 @@ describe("Check upgradeToHttps()", () => {
 
         expect(
             HTTPS.upgradeToHttps([])
-        ).toBe(false);
+        ).toBe(GENERIC.INVALID_RESULT);
 
         expect(
             HTTPS.upgradeToHttps([{protocol:"http:"}])
-        ).toBe(false);
+        ).toBe(GENERIC.INVALID_RESULT);
 
     });
 
@@ -21,7 +23,7 @@ describe("Check upgradeToHttps()", () => {
             {protocol:"http:"}
         ];
 
-        expect(HTTPS.upgradeToHttps(INPUT)).toBe(false);
+        expect(HTTPS.upgradeToHttps(INPUT)).toBe(GENERIC.INVALID_RESULT);
 
     });
 
@@ -32,7 +34,7 @@ describe("Check upgradeToHttps()", () => {
             {protocol:"https:"}
         ];
 
-        expect(HTTPS.upgradeToHttps(INPUT)).toBe(true);
+        expect(HTTPS.upgradeToHttps(INPUT)).toBe(GENERIC.VALID_RESULT);
 
     });
 
@@ -83,25 +85,25 @@ describe("Check secureRedirectionChain()", () => {
             {protocol:"https:"},
             {protocol:"http:"},
             {protocol:"http:"}
-        ])).toBe(false);
+        ])).toBe(GENERIC.INVALID_RESULT);
 
         expect(HTTPS.secureRedirectionChain([
             {protocol:"https:"},
             {protocol:"https:"},
             {protocol:"http:"}
-        ])).toBe(false);
+        ])).toBe(GENERIC.INVALID_RESULT);
 
         expect(HTTPS.secureRedirectionChain([
             {protocol:"https:"},
             {protocol:"http:"},
             {protocol:"https:"}
-        ])).toBe(false);
+        ])).toBe(GENERIC.INVALID_RESULT);
 
         expect(HTTPS.secureRedirectionChain([
             {protocol:"https:"},
             {protocol:"https:"},
             {protocol:"https:"}
-        ])).toBe(true);
+        ])).toBe(GENERIC.VALID_RESULT);
 
     });
 
@@ -112,43 +114,41 @@ describe("Check httpStrictTransportSecurity()", () => {
 
     test("invalid headers", () => {
 
-        const OUTPUT = {result:false};
-
         expect(
             HTTPS.httpStrictTransportSecurity("max-age=0")
-        ).toEqual(OUTPUT);
+        ).toEqual(GENERIC.INVALID_RESULT);
 
         expect(
             HTTPS.httpStrictTransportSecurity("max-age = 0")
-        ).toEqual(OUTPUT);
+        ).toEqual(GENERIC.INVALID_RESULT);
 
         expect(
             HTTPS.httpStrictTransportSecurity("max -age=1000")
-        ).toEqual(OUTPUT);
+        ).toEqual(GENERIC.INVALID_RESULT);
 
         expect(
             HTTPS.httpStrictTransportSecurity("max-age=-1000")
-        ).toEqual(OUTPUT);
+        ).toEqual(GENERIC.INVALID_RESULT);
 
         expect(
             HTTPS.httpStrictTransportSecurity("strict-transport-security: max-age=1000")
-        ).toEqual(OUTPUT);
+        ).toEqual(GENERIC.INVALID_RESULT);
 
         expect(
             HTTPS.httpStrictTransportSecurity("1")
-        ).toEqual(OUTPUT);
+        ).toEqual(GENERIC.INVALID_RESULT);
 
         expect(
             HTTPS.httpStrictTransportSecurity("true")
-        ).toEqual(OUTPUT);
+        ).toEqual(GENERIC.INVALID_RESULT);
 
         expect(
             HTTPS.httpStrictTransportSecurity("")
-        ).toEqual(OUTPUT);
+        ).toEqual(GENERIC.INVALID_RESULT);
 
         expect(
             HTTPS.httpStrictTransportSecurity(undefined)
-        ).toEqual(OUTPUT);
+        ).toEqual(GENERIC.INVALID_RESULT);
 
     });
 
