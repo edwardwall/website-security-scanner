@@ -2,6 +2,40 @@ const HTTP = require("../src/http.js");
 const GENERIC = require("../src/generic.js");
 
 
+describe("Check referrerPolicy()", () => {
+
+    test("invalid headers", () => {
+
+        expect(HTTP.xFrameOptions(undefined))
+            .toEqual(GENERIC.INVALID_RESULT);
+
+        expect(HTTP.xFrameOptions(""))
+            .toEqual(GENERIC.INVALID_RESULT);
+
+        expect(HTTP.xFrameOptions("no referrer"))
+            .toEqual(GENERIC.INVALID_RESULT);
+
+        expect(HTTP.xFrameOptions("unsafe-url"))
+            .toEqual(GENERIC.INVALID_RESULT);
+
+    });
+
+    test("valid headers", () => {
+
+        expect(HTTP.xFrameOptions("no-referrer"))
+            .toEqual(GENERIC.VALID_RESULT);
+
+        expect(HTTP.xFrameOptions("same-origin"))
+            .toEqual(GENERIC.VALID_RESULT);
+
+        expect(HTTP.xFrameOptions("strict-origin-when-cross-origin"))
+            .toEqual(GENERIC.VALID_RESULT);
+
+    });
+
+});
+
+
 describe("Check xContentTypeOptions()", () => {
 
     test("invalid headers", () => {

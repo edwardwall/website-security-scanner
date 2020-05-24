@@ -2,6 +2,42 @@ const GENERIC = require("./generic.js");
 
 
 /**
+ * Check Referrer-Policy header.
+ */
+function referrerPolicy(header) {
+
+    if (undefined === header) {
+        return GENERIC.INVALID_RESULT;
+    }
+
+    header = header.toLowerCase().trim();
+
+    const REFERRERS = [
+        "no-referrer",
+        "origin",
+        "origin-when-cross-origin",
+        "same-origin",
+        "strict-origin",
+        "strict-origin-when-cross-origin"
+    ];
+
+    /*
+        "no-referrer-when-downgraded" and "unsafe-url"
+        are excluded as they allow full referrer to other origins
+    */
+
+    for (ref of REFERRERS) {
+        if (ref === header) {
+            return GENERIC.VALID_RESULT;
+        }
+    }
+
+    return GENERIC.INVALID_RESULT;
+
+}
+
+
+/**
  * Check X-Content-Type-Options header.
  *
  * @param {string} header
