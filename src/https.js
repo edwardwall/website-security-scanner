@@ -51,7 +51,7 @@ function secureRedirectionChain(chain) {
  */
 function httpStrictTransportSecurity(header) {
 
-    const INVALID = {valid:false};
+    const INVALID = {result:false};
 
     if (undefined === header) {
         return INVALID;
@@ -87,8 +87,8 @@ function httpStrictTransportSecurity(header) {
     }
 
     return {
-        valid:true,
-        result:{
+        result:true,
+        data:{
             age,
             includeSubdomains,
             preload

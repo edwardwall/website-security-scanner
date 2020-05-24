@@ -112,7 +112,7 @@ describe("Check httpStrictTransportSecurity()", () => {
 
     test("invalid headers", () => {
 
-        const OUTPUT = {valid:false};
+        const OUTPUT = {result:false};
 
         expect(
             HTTPS.httpStrictTransportSecurity("max-age=0")
@@ -157,8 +157,8 @@ describe("Check httpStrictTransportSecurity()", () => {
         expect(
             HTTPS.httpStrictTransportSecurity("max-age=1000  ; includeSubdomains;")
         ).toEqual({
-            valid:true,
-            result:{
+            result:true,
+            data:{
                 age:1000,
                 includeSubdomains: true,
                 preload: false
@@ -168,8 +168,8 @@ describe("Check httpStrictTransportSecurity()", () => {
         expect(
             HTTPS.httpStrictTransportSecurity("max-AGE = 1000 preload")
         ).toEqual({
-            valid:true,
-            result:{
+            result:true,
+            data:{
                 age:1000,
                 includeSubdomains: false,
                 preload: false
@@ -179,8 +179,8 @@ describe("Check httpStrictTransportSecurity()", () => {
         expect(
             HTTPS.httpStrictTransportSecurity("max-age=1000000; includeSubdomains;preload")
         ).toEqual({
-            valid:true,
-            result:{
+            result:true,
+            data:{
                 age:1000000,
                 includeSubdomains:true,
                 preload:true
@@ -190,8 +190,8 @@ describe("Check httpStrictTransportSecurity()", () => {
         expect(
             HTTPS.httpStrictTransportSecurity("max-age=100 1 ;includeSubdomains-preload")
         ).toEqual({
-            valid:true,
-            result:{
+            result:true,
+            data:{
                 age:100,
                 includeSubdomains:false,
                 preload:false
