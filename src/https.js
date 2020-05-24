@@ -44,7 +44,53 @@ function secureRedirectionChain(chain) {
 }
 
 
+/**
+ * Test for HTTP Strict Transport Security header.
+ *
+ * @param {string} header
+ */
+function httpStrictTransportSecurity(header) {
+
+    const INVALID = {valid:false};
+
+    if (undefined === header) {
+        return INVALID;
+    }
+
+    header = header.split(";");
+
+    let age = 0;
+
+    for (i = 0; i < header.length; i++) {
+
+        let directive = header[i];
+
+        if (directive.includes("max-age") &&
+            directive.replace(/ /g, "").startsWith("max-age=")) {
+
+            age = directive.substring(directive.indexOf("=") + 1);
+            age = parseInt(age);
+
+        }
+
+    }
+
+    if (!(0 < age)) {
+        return INVALID;
+    }
+
+    return {
+        valid:true,
+        result:{
+            age
+        }
+    };
+
+}
+
+
 module.exports = {
     upgradeToHttps,
-    secureRedirectionChain
+    secureRedirectionChain,
+    httpStrictTransportSecurity
 };

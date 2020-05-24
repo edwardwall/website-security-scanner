@@ -106,3 +106,82 @@ describe("Check secureRedirectionChain()", () => {
     });
 
 });
+
+
+describe("Check httpStrictTransportSecurity()", () => {
+
+    test("invalid headers", () => {
+
+        const OUTPUT = {valid:false};
+
+        expect(
+            HTTPS.httpStrictTransportSecurity("max-age=0")
+        ).toEqual(OUTPUT);
+
+        expect(
+            HTTPS.httpStrictTransportSecurity("max-age = 0")
+        ).toEqual(OUTPUT);
+
+        expect(
+            HTTPS.httpStrictTransportSecurity("max -age=1000")
+        ).toEqual(OUTPUT);
+
+        expect(
+            HTTPS.httpStrictTransportSecurity("max-age=-1000")
+        ).toEqual(OUTPUT);
+
+        expect(
+            HTTPS.httpStrictTransportSecurity("strict-transport-security: max-age=1000")
+        ).toEqual(OUTPUT);
+
+        expect(
+            HTTPS.httpStrictTransportSecurity("1")
+        ).toEqual(OUTPUT);
+
+        expect(
+            HTTPS.httpStrictTransportSecurity("true")
+        ).toEqual(OUTPUT);
+
+        expect(
+            HTTPS.httpStrictTransportSecurity("")
+        ).toEqual(OUTPUT);
+
+        expect(
+            HTTPS.httpStrictTransportSecurity(undefined)
+        ).toEqual(OUTPUT);
+
+    });
+
+    test("valid headers", () => {
+
+        expect(
+            HTTPS.httpStrictTransportSecurity("max-age=1000")
+        ).toEqual({
+            valid:true,
+            result:{age:1000}
+        });
+
+        expect(
+            HTTPS.httpStrictTransportSecurity("max-age = 1000")
+        ).toEqual({
+            valid:true,
+            result:{age:1000}
+        });
+
+        expect(
+            HTTPS.httpStrictTransportSecurity("max-age=1000000")
+        ).toEqual({
+            valid:true,
+            result:{age:1000000}
+        });
+
+        expect(
+            HTTPS.httpStrictTransportSecurity("max-age=100 1")
+        ).toEqual({
+            valid:true,
+            result:{age:100}
+        });
+
+    });
+
+});
