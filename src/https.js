@@ -57,20 +57,27 @@ function httpStrictTransportSecurity(header) {
         return INVALID;
     }
 
-    header = header.split(";");
+    header = header.toLowerCase().split(";");
 
     let age = 0;
+    let includeSubdomains = false;
+    let preload = false;
 
     for (i = 0; i < header.length; i++) {
 
-        let directive = header[i];
+        let directive = header[i].trim() + " ";
 
-        if (directive.includes("max-age") &&
+        if (directive.startsWith("max-age") &&
             directive.replace(/ /g, "").startsWith("max-age=")) {
 
             age = directive.substring(directive.indexOf("=") + 1);
             age = parseInt(age);
 
+        } else if (directive.startsWith("includesubdomains ")) {
+            includeSubdomains = true;
+
+        } else if (directive.startsWith("preload ")) {
+            preload = true;
         }
 
     }
@@ -82,7 +89,9 @@ function httpStrictTransportSecurity(header) {
     return {
         valid:true,
         result:{
-            age
+            age,
+            includeSubdomains,
+            preload
         }
     };
 
