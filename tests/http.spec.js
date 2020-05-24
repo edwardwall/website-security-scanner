@@ -6,30 +6,45 @@ describe("Check referrerPolicy()", () => {
 
     test("invalid headers", () => {
 
-        expect(HTTP.xFrameOptions(undefined))
+        expect(HTTP.referrerPolicy(undefined))
             .toEqual(GENERIC.INVALID_RESULT);
 
-        expect(HTTP.xFrameOptions(""))
+        expect(HTTP.referrerPolicy(""))
             .toEqual(GENERIC.INVALID_RESULT);
 
-        expect(HTTP.xFrameOptions("no referrer"))
+        expect(HTTP.referrerPolicy("no referrer"))
             .toEqual(GENERIC.INVALID_RESULT);
 
-        expect(HTTP.xFrameOptions("unsafe-url"))
+        expect(HTTP.referrerPolicy("unsafe-url"))
             .toEqual(GENERIC.INVALID_RESULT);
 
     });
 
     test("valid headers", () => {
 
-        expect(HTTP.xFrameOptions("no-referrer"))
-            .toEqual(GENERIC.VALID_RESULT);
+        expect(HTTP.referrerPolicy("no-referrer"))
+            .toEqual({
+                result:true,
+                data:{
+                    value:"no-referrer"
+                }
+            });
 
-        expect(HTTP.xFrameOptions("same-origin"))
-            .toEqual(GENERIC.VALID_RESULT);
+        expect(HTTP.referrerPolicy("same-origin"))
+            .toEqual({
+                result:true,
+                data:{
+                    value:"same-origin"
+                }
+            });
 
-        expect(HTTP.xFrameOptions("strict-origin-when-cross-origin"))
-            .toEqual(GENERIC.VALID_RESULT);
+        expect(HTTP.referrerPolicy("strict-origin-when-cross-origin"))
+            .toEqual({
+                result:true,
+                data:{
+                    value:"strict-origin-when-cross-origin"
+                }
+            });
 
     });
 

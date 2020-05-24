@@ -28,7 +28,12 @@ function referrerPolicy(header) {
 
     for (ref of REFERRERS) {
         if (ref === header) {
-            return GENERIC.VALID_RESULT;
+            return {
+                result:true,
+                data:{
+                    value:header
+                }
+            };
         }
     }
 
@@ -119,6 +124,7 @@ function xXssProtectionHeader(header) {
 
 
 module.exports = {
+    referrerPolicy,
     xContentTypeOptions,
     xFrameOptions,
     xXssProtectionHeader
