@@ -1,5 +1,8 @@
 const HTTPS = require("https")
 
+const INVALID_RESULT = {result:false};
+const VALID_RESULT   = {result:true};
+
 
 async function get(url, callback) {
 
@@ -63,6 +66,8 @@ function checkHeaderKeyValue(header, key, value) {
 
 
 module.exports = {
+    INVALID_RESULT,
+    VALID_RESULT,
     get,
     checkHeaderKeyValue
 };
