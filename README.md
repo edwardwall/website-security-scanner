@@ -1,6 +1,6 @@
 # Website Security Scanner
 
-![Node.js CI](https://github.com/edwardwall/website-security-scanner/workflows/Node.js%20CI/badge.svg)
+![npm test](https://github.com/edwardwall/website-security-scanner/workflows/npm%20test/badge.svg)
 
 ## To Test
 > npm test
