@@ -4,6 +4,27 @@ const INVALID_RESULT = {result:false};
 const VALID_RESULT   = {result:true};
 
 
+/**
+ * @typedef {Object} Result
+ * @property {boolean} result
+ * @property {Object} [data]
+ */
+
+
+/**
+ * @typedef {Object} URL
+ * @property {string} protocol
+ * @property {string} hostname
+ * @property {string} path
+ * @property {string} href
+ */
+
+
+/**
+ * Function to make a generic HTTPS GET request.
+ * @param {string} url
+ * @param {function} callback
+ */
 async function get(url, callback) {
 
     HTTPS.get(url, (res) => {
@@ -26,11 +47,11 @@ async function get(url, callback) {
 
 
 /**
- * Search through header for properly formed key=value pair.
- *
+ * Search through header for key=value pair.
  * @param {string} header
  * @param {string} key
  * @param {string} value
+ * @returns {boolean}
  */
 function checkHeaderKeyValue(header, key, value) {
 
@@ -66,9 +87,13 @@ function checkHeaderKeyValue(header, key, value) {
 
 
 /**
+ * @typedef {Result} ResultPolicy
+ * @property {string[]} data.*
+ */
+/**
  * Parse a policy (CSP or Feature).
- *
  * @param {string} policy
+ * @returns {ResultPolicy}
  */
 function parsePolicy(policy) {
 

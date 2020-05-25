@@ -1,8 +1,14 @@
 const GENERIC = require("./generic.js");
 
 
+ /**
+ * @typedef {Result} ResultReferrerPolicy
+ * @property {string} data.value
+ */
 /**
  * Check Referrer-Policy header.
+ * @param {string} header
+ * @returns {ResultReferrerPolicy}
  */
 function referrerPolicy(header) {
 
@@ -21,10 +27,8 @@ function referrerPolicy(header) {
         "strict-origin-when-cross-origin"
     ];
 
-    /*
-        "no-referrer-when-downgraded" and "unsafe-url"
-        are excluded as they allow full referrer to other origins
-    */
+    // "no-referrer-when-downgraded" and "unsafe-url" excluded
+    // because they allow full referrer to other origins
 
     for (ref of REFERRERS) {
         if (ref === header) {
@@ -44,8 +48,8 @@ function referrerPolicy(header) {
 
 /**
  * Check X-Content-Type-Options header.
- *
  * @param {string} header
+ * @returns {Result}
  */
 function xContentTypeOptions(header) {
 
@@ -62,6 +66,8 @@ function xContentTypeOptions(header) {
 
 /**
  * Check X-Frame-Options header.
+ * @param {string} header
+ * @returns {Result}
  */
 function xFrameOptions(header) {
 
@@ -90,9 +96,13 @@ function xFrameOptions(header) {
 
 
 /**
+ * @typedef {Result} ResultXssProtection
+ * @property {boolean} data.block
+ */
+/**
  * Check X-XSS-Protection HTTP header.
- *
  * @param {string} header
+ * @returns {ResultXssProtection}
  */
 function xXssProtectionHeader(header) {
 

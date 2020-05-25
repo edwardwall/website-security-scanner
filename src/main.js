@@ -1,6 +1,12 @@
 const URL = require("url");
 
 
+/**
+ * Parse Location header returned as HTTP redirect.
+ * @param {string} location
+ * @param {Object} options
+ * @returns {string}
+ */
 function parseLocation(location, options) {
 
     let url;

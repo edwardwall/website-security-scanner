@@ -3,8 +3,9 @@ const GENERIC = require("./generic.js");
 
 /**
  * Test whether the server immediately upgrades to HTTPS.
- *
  * @param {URL[]} chain
+ * @returns {Result}
+ * @throws If first request is HTTPS
  */
 function upgradeToHttps(chain) {
 
@@ -27,8 +28,9 @@ function upgradeToHttps(chain) {
 
 /**
  * Test whether the server maintains a secure connection.
- *
  * @param {URL[]} chain
+ * @returns {Result}
+ * @throws If first request is HTTP
  */
 function secureRedirectionChain(chain) {
 
@@ -56,9 +58,15 @@ function secureRedirectionChain(chain) {
 
 
 /**
+ * @typedef {Result} ResultHsts
+ * @property {number} data.age
+ * @property {boolean} data.includeSubdomains
+ * @property {boolean} data.preload
+ */
+/**
  * Test for HTTP Strict Transport Security header.
- *
  * @param {string} header
+ * @returns {ResultHsts}
  */
 function httpStrictTransportSecurity(header) {
 
