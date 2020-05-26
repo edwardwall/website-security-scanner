@@ -107,6 +107,10 @@ function parsePolicy(policy) {
 
         section = section.trim();
 
+        if ("" === section) {
+            continue;
+        }
+
         let directive = section.substring(0, section.indexOf(" "));
         section = section.substring(section.indexOf(" ") + 1);
 

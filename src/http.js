@@ -47,6 +47,56 @@ function referrerPolicy(header) {
 
 
 /**
+ * Check Feature-Policy header.
+ * @param {string} header
+ * @returns {ResultPolicy}
+ */
+function featurePolicy(header) {
+
+    if (undefined === header) {
+        return {
+            result:false,
+            data:{}
+        }
+    }
+
+    let data = GENERIC.parsePolicy(header);
+
+    const DIRECTIVES = [
+        "camera",
+        "display-capture",
+        "geolocation",
+        "microphone",
+        "payment",
+        "publickey-credentials-get"
+    ];
+
+    let safe = true;
+
+    for (directive of DIRECTIVES) {
+
+        if (undefined === data[directive]) {
+            continue;
+        }
+
+        for (elem of data[directive]) {
+
+            elem = elem.trim();
+
+            if ("*" === elem || elem.startsWith("http:")) {
+                safe = false;
+            }
+        }
+    }
+
+    return {
+        result:safe,
+        data
+    };
+}
+
+
+/**
  * Check X-Content-Type-Options header.
  * @param {string} header
  * @returns {Result}
@@ -135,6 +185,7 @@ function xXssProtectionHeader(header) {
 
 module.exports = {
     referrerPolicy,
+    featurePolicy,
     xContentTypeOptions,
     xFrameOptions,
     xXssProtectionHeader

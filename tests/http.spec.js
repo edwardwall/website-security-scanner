@@ -51,6 +51,78 @@ describe("Check referrerPolicy()", () => {
 });
 
 
+describe("Check featurePolicy()", () => {
+
+    test("safe headers", () => {
+
+        expect(HTTP.featurePolicy("accelerometer 'none'; camera 'none'; geolocation 'none'; microphone 'none'; payment 'none'"))
+            .toEqual({
+                result:true,
+                data:{
+                    accelerometer:["'none'"],
+                    camera:["'none'"],
+                    geolocation:["'none'"],
+                    microphone:["'none'"],
+                    payment:["'none'"]
+                }
+            });
+
+        expect(HTTP.featurePolicy("camera 'none'; geolocation 'src' https://example.com"))
+            .toEqual({
+                result:true,
+                data:{
+                    camera:["'none'"],
+                    geolocation:[
+                        "'src'",
+                        "https://example.com"
+                    ]
+                }
+            });
+
+    });
+
+    test("unsafe headers", () => {
+
+        expect(HTTP.featurePolicy("camera https://example.com 'self'; microphone 'self' http://example.com"))
+            .toEqual({
+                result:false,
+                data:{
+                    camera:[
+                        "https://example.com",
+                        "'self'"
+                    ],
+                    microphone:[
+                        "'self'",
+                        "http://example.com"
+                    ]
+                }
+            });
+
+        expect(HTTP.featurePolicy("accelerometer 'none'; camera 'none'; geolocation *; microphone 'none';"))
+            .toEqual({
+                result:false,
+                data:{
+                    accelerometer:["'none'"],
+                    camera:["'none'"],
+                    geolocation:["*"],
+                    microphone:["'none'"]
+                }
+            })
+
+    });
+
+    test("invalid headers", () => {
+
+        expect(HTTP.featurePolicy(undefined)).toEqual({
+            result:false,
+            data:{}
+        });
+
+    });
+
+});
+
+
 describe("Check xContentTypeOptions()", () => {
 
     test("invalid headers", () => {
