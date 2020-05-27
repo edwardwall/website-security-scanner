@@ -22,9 +22,22 @@ const VALID_RESULT   = {result:true};
 
 
 /**
+ * Callback for async tests to store result.
+ * @callback CallbackResult
+ * @param {Result} result
+ */
+
+/**
+ * Callback for analysing result from generic get().
+ * @callback CallbackAnalyse
+ * @param {string} body
+ */
+
+
+/**
  * Function to make a generic HTTPS GET request.
  * @param {string} url
- * @param {function} callback
+ * @param {CallbackAnalyse} callback
  */
 async function get(url, callback) {
 
@@ -37,7 +50,7 @@ async function get(url, callback) {
         });
 
         res.on("end", () => {
-            callback(res.headers, body);
+            callback(body);
         });
 
     }).on("error", (err) => {
