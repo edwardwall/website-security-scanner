@@ -4,8 +4,7 @@ const GENERIC = require("./generic.js")
 /**
  * Check DNS Certification Authority Authorization (CAA).
  * @param {string} domain
- * @param {CallbackResult} callback
- * @returns {Result}
+ * @param {CallbackAnalyse} callback
  */
 async function caa(domain, callback) {
 
@@ -50,6 +49,34 @@ async function caa(domain, callback) {
 }
 
 
+/**
+ * Check DNS Secure Extensions (DNSSEC).
+ * @param {string} domain
+ * @param {CallbackAnalyse} callback
+ */
+async function dnssec(domain, callback) {
+
+    let wrappedCallback = (body) => {
+
+        body = JSON.parse(body);
+
+        if (body.Answer) {
+            callback(GENERIC.VALID_RESULT);
+        } else {
+            callback(GENERIC.INVALID_RESULT);
+        }
+
+    };
+
+    GENERIC.get(
+        "https://dns.google.com/resolve?type=DS&dnssec=true&name=" + domain,
+        wrappedCallback
+    );
+
+}
+
+
 module.exports = {
-    caa
+    caa,
+    dnssec
 }
