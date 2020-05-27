@@ -27,25 +27,29 @@ function upgradeToHttps(chain) {
 
 
 /**
- * Test whether the server maintains a secure connection.
+ * Test whether the server redirects through secure connections.
  * @param {URL[]} chain
  * @returns {Result}
- * @throws If first request is HTTP
+ * @throws If chain has 0 elements.
  */
 function secureRedirectionChain(chain) {
 
-    if ("http:" === chain[0].protocol) {
-        throw "First URL should be HTTPS";
+    if (0 === chain.length) {
+        throw Error("Chain cannot be empty.");
+
+    } else if (1 === chain.length) {
+        // Do nothing.
+
+    } else {
+        chain.shift(); // Remove first element.
     }
 
     let secure = true;
 
     for (url of chain) {
-
-        if ("https:" != url.protocol) {
+        if ("https:" !== url.protocol) {
             secure = false;
         }
-
     }
 
     if (secure) {

@@ -61,21 +61,21 @@ describe("Check upgradeToHttps()", () => {
 
 describe("Check secureRedirectionChain()", () => {
 
-    test("initial connection is http", () => {
+    test("empty chain", () => {
 
         expect(() => {
-            HTTPS.secureRedirectionChain([
-                {protocol:"http:"},
-                {protocol:"http:"}
-            ])
+            HTTPS.secureRedirectionChain([])
         }).toThrow();
 
-        expect(() => {
-            HTTPS.secureRedirectionChain([
-                {protocol:"http:"},
-                {protocol:"https:"}
-            ])
-        }).toThrow();
+    });
+
+    test("single element in chain", () => {
+
+        expect(HTTPS.secureRedirectionChain([{protocol:"http:"}]))
+            .toEqual(GENERIC.INVALID_RESULT);
+
+        expect(HTTPS.secureRedirectionChain([{protocol:"https:"}]))
+            .toEqual(GENERIC.VALID_RESULT);
 
     });
 
@@ -94,13 +94,19 @@ describe("Check secureRedirectionChain()", () => {
         ])).toBe(GENERIC.INVALID_RESULT);
 
         expect(HTTPS.secureRedirectionChain([
-            {protocol:"https:"},
+            {protocol:"http:"},
             {protocol:"http:"},
             {protocol:"https:"}
         ])).toBe(GENERIC.INVALID_RESULT);
 
         expect(HTTPS.secureRedirectionChain([
             {protocol:"https:"},
+            {protocol:"https:"},
+            {protocol:"https:"}
+        ])).toBe(GENERIC.VALID_RESULT);
+
+        expect(HTTPS.secureRedirectionChain([
+            {protocol:"http:"},
             {protocol:"https:"},
             {protocol:"https:"}
         ])).toBe(GENERIC.VALID_RESULT);
