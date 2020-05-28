@@ -86,6 +86,20 @@ class WebsiteSecurityScanner {
 
         }).then(() => {
 
+            /* DNS */
+
+            return Promise.all([
+                TEST.DNS.caa(this.domain),
+                TEST.DNS.dnssec(this.domain)
+
+            ]).then(([caa, dnssec]) => {
+
+                this.results.caa = caa;
+                this.results.dnssec = dnssec;
+            });
+
+        }).then(() => {
+
             /* HTTPS */
 
             let requests = chain.map(e => e.request);
@@ -96,7 +110,7 @@ class WebsiteSecurityScanner {
             this.results.secureRedirectionChain =
                 TEST.HTTPS.secureRedirectionChain(requests);
 
-            this.results.HSTS =
+            this.results.hsts =
                 TEST.HTTPS.httpStrictTransportSecurity(
                     last.headers["strict-transport-security"]);
 
