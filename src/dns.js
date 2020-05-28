@@ -33,26 +33,28 @@ async function caa(domain) {
 /**
  * Check DNS Secure Extensions (DNSSEC).
  * @param {string} domain
- * @param {CallbackAnalyse} callback
+ * @returns {Result}
  */
 async function dnssec(domain, callback) {
 
-    let wrappedCallback = (body) => {
+    return new Promise((resolve, reject) => {
 
-        body = JSON.parse(body);
+        let callback = (body) => {
+            body = JSON.parse(body);
 
-        if (body.Answer) {
-            callback(GENERIC.VALID_RESULT);
-        } else {
-            callback(GENERIC.INVALID_RESULT);
+            if (body.Answer) {
+                resolve(GENERIC.VALID_RESULT);
+            } else {
+                resolve(GENERIC.INVALID_RESULT);
+            }
         }
 
-    };
+        GENERIC.get(
+            "https://dns.google.com/resolve?type=DS&dnssec=true&name=" + domain,
+            callback
+        );
 
-    GENERIC.get(
-        "https://dns.google.com/resolve?type=DS&dnssec=true&name=" + domain,
-        wrappedCallback
-    );
+    });
 
 }
 
