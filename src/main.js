@@ -58,6 +58,47 @@ class WebsiteSecurityScanner {
      */
     scan() {
 
+        let chain;
+
+        Promise.allSettled([
+            followChain("http:", this.domain),
+            followChain("https:",this.domain)
+
+        ]).then(([http, https]) => {
+
+            if ("rejected" === http.status &&
+                "rejected" === https.status) {
+
+                throw Error("Both promises rejected.");
+
+            } else if ("rejected" === http.status) {
+                chain = https.value;
+
+            } else if ("rejected" === https.status) {
+                chain = http.value;
+
+            } else { // Both fulfilled
+                chain = http.value; // use HTTP as default
+            }
+
+        }).then(() => {
+
+            /* HTTPS */
+
+            let requests = chain.map(e => e.options);
+
+            this.results.upgradeToHttps =
+                TEST.HTTPS.upgradeToHttps(requests);
+
+            this.results.secureRedirectionChain =
+                TEST.HTTPS.secureRedirectionChain(requests);
+
+            this.results.HSTS =
+                TEST.HTTPS.httpStrictTransportSecurity(
+                    chain[chain.length - 1].headers["strict-transport-security"]);
+
+        })
+
     }
 
 }
@@ -84,8 +125,12 @@ function followChain(protocol, hostname) {
         let chain = [];
 
         let callback = (result) => {
+            if (undefined === result) {
+                reject();
+            }
+
             chain.push(result);
-            if (300 < result.status) {
+            if (300 > result.status) {
                 resolve(chain);
             }
         }
@@ -163,8 +208,14 @@ async function request(options, data, callback) {
 
             request(nextOptions, data, callback);
 
+        } else { // Error
+
+            callback(undefined);
+
         }
 
+    }).on("error", (err) => {
+        callback(undefined);
     });
 
 }
