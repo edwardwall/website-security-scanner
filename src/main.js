@@ -65,6 +65,111 @@ class WebsiteSecurityScanner {
 module.exports = WebsiteSecurityScanner;
 
 
+function followChain(protocol, hostname) {
+
+    return new Promise((resolve, reject) => {
+
+        let options = {
+            protocol,
+            hostname,
+            path: "/",
+            headers: {}
+        };
+
+        let data = {
+            chainLength: 0,
+            cookies: {}
+        };
+
+        let chain = [];
+
+        let callback = (result) => {
+            chain.push(result);
+            if (300 < result.status) {
+                resolve(chain);
+            }
+        }
+
+        request(options, data, callback);
+
+    });
+
+}
+
+
+
+async function request(options, data, callback) {
+
+    data.chainLength += 1;
+    if (8 < data.chainLength) {
+        throw Error("Too many redirects - " + options.hostname);
+    }
+
+    let cookies = [];
+    for (key in data.cookies) {
+        cookies.push(key + "=" + data.cookies[key]);
+    }
+
+    options.headers.cookies = cookies.join("; ");
+    options.headers["user-agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/537.36";
+
+    ("https:" === options.protocol ? NODE.HTTPS : NODE.HTTP).get(options, (res) => {
+
+        let location;
+        try {
+            location = res.headers.location;
+        } catch (e) {}
+
+        if (undefined === location) {
+            location = "";
+        }
+
+        let status = res.statusCode;
+
+        if (300 > status) { // Success
+
+            let body = "";
+
+            res.on("data", (chunk) => {
+                body += chunk.toString();
+            });
+
+            res.on("end", () => {
+                callback({
+                    status,
+                    options,
+                    headers: res.headers,
+                    body
+                });
+            });
+
+        } else if (400 > status) { // Redirect
+
+            callback({
+                status,
+                options,
+                headers: res.headers
+            });
+
+            location = parseLocation(location, options);
+            location = NODE.URL.parse(location);
+
+            let nextOptions = {
+                protocol: location.protocol,
+                hostname: location.hostname,
+                path: location.path,
+                headers: {}
+            };
+
+            request(nextOptions, data, callback);
+
+        }
+
+    });
+
+}
+
+
 /**
  * Parse Location header returned as HTTP redirect.
  * @param {string} location
