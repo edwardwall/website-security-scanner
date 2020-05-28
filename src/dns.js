@@ -4,47 +4,28 @@ const GENERIC = require("./generic.js")
 /**
  * Check DNS Certification Authority Authorization (CAA).
  * @param {string} domain
- * @param {CallbackAnalyse} callback
+ * @returns {Result}
  */
-async function caa(domain, callback) {
+async function caa(domain) {
 
-    let wrappedCallback = (body) => {
+    return new Promise((resolve, reject) => {
 
-        body = JSON.parse(body);
+        let callback = (body) => {
+            body = JSON.parse(body);
 
-        if (!body.Answer) {
-            callback(GENERIC.INVALID_RESULT);
-            return;
-        }
-
-        let issuer = false;
-
-        for (elem of body.Answer) {
-
-            elem = elem.data;
-            elem = elem.substring("0 ".length);
-            elem = elem.toLowerCase().trim();
-
-            if (elem.startsWith("issue ") ||
-                elem.startsWith("issuewild ")) {
-
-                issuer = true;
+            if (body.Answer) {
+                resolve(GENERIC.VALID_RESULT);
+            } else {
+                resolve(GENERIC.INVALID_RESULT);
             }
-
         }
 
-        if (issuer) {
-            callback(GENERIC.VALID_RESULT);
-        } else {
-            callback(GENERIC.INVALID_RESULT);
-        }
+        GENERIC.get(
+            "https://dns.google.com/resolve?type=CAA&dnssec=true&name=" + domain,
+            callback
+        );
 
-    };
-
-    GENERIC.get(
-        "https://dns.google.com/resolve?type=CAA&dnssec=true&name=" + domain,
-        wrappedCallback
-    );
+    });
 
 }
 
