@@ -85,7 +85,7 @@ class WebsiteSecurityScanner {
 
             /* HTTPS */
 
-            let requests = chain.map(e => e.options);
+            let requests = chain.map(e => e.request);
 
             this.results.upgradeToHttps =
                 TEST.HTTPS.upgradeToHttps(requests);
@@ -96,6 +96,10 @@ class WebsiteSecurityScanner {
             this.results.HSTS =
                 TEST.HTTPS.httpStrictTransportSecurity(
                     chain[chain.length - 1].headers["strict-transport-security"]);
+
+            this.results.certificate =
+                TEST.HTTPS.certificateValidity(
+                    chain[chain.length - 1].certificate);
 
         })
 
@@ -113,8 +117,7 @@ function followChain(protocol, hostname) {
         let options = {
             protocol,
             hostname,
-            path: "/",
-            headers: {}
+            path: "/"
         };
 
         let data = {
@@ -145,6 +148,9 @@ function followChain(protocol, hostname) {
 
 async function request(options, data, callback) {
 
+    options.agent = false;
+    options.headers = {};
+
     data.chainLength += 1;
     if (8 < data.chainLength) {
         throw Error("Too many redirects - " + options.hostname);
@@ -174,6 +180,7 @@ async function request(options, data, callback) {
         if (300 > status) { // Success
 
             let body = "";
+            let certificate = res.socket.getPeerCertificate();
 
             res.on("data", (chunk) => {
                 body += chunk.toString();
@@ -182,8 +189,9 @@ async function request(options, data, callback) {
             res.on("end", () => {
                 callback({
                     status,
-                    options,
+                    request: options,
                     headers: res.headers,
+                    certificate,
                     body
                 });
             });
@@ -192,8 +200,8 @@ async function request(options, data, callback) {
 
             callback({
                 status,
-                options,
-                headers: res.headers
+                request: options,
+                headers: res.header
             });
 
             location = parseLocation(location, options);
@@ -202,8 +210,7 @@ async function request(options, data, callback) {
             let nextOptions = {
                 protocol: location.protocol,
                 hostname: location.hostname,
-                path: location.path,
-                headers: {}
+                path: location.path
             };
 
             request(nextOptions, data, callback);
