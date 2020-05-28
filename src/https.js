@@ -119,8 +119,41 @@ function httpStrictTransportSecurity(header) {
 }
 
 
+/**
+ * @typedef {Result} ResultCertificate
+ * @property {number} data.length
+ */
+/**
+ * Check for Certificate validity.
+ * @param {Object} certificate
+ * @param {ResultCertificate}
+ */
+function certificateValidity(certificate) {
+
+    if (undefined === certificate) {
+        return GENERIC.INVALID_RESULT;
+    }
+
+    let start = Date.parse(certificate.valid_from);
+    let end   = Date.parse(certificate.valid_to);
+
+    let length = end - start;
+    length /= (1000 * 60 * 60 * 24); // covert from miliseconds to days
+    length = Math.floor(length);
+
+    return {
+        result: (190 >= length), // roughly 6 months
+        data:{
+            length
+        }
+    };
+
+}
+
+
 module.exports = {
     upgradeToHttps,
     secureRedirectionChain,
-    httpStrictTransportSecurity
+    httpStrictTransportSecurity,
+    certificateValidity
 };
