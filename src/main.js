@@ -59,6 +59,7 @@ class WebsiteSecurityScanner {
     scan() {
 
         let chain;
+        let last;
 
         Promise.allSettled([
             followChain("http:", this.domain),
@@ -81,6 +82,8 @@ class WebsiteSecurityScanner {
                 chain = http.value; // use HTTP as default
             }
 
+            last = chain[chain.length - 1];
+
         }).then(() => {
 
             /* HTTPS */
@@ -95,13 +98,37 @@ class WebsiteSecurityScanner {
 
             this.results.HSTS =
                 TEST.HTTPS.httpStrictTransportSecurity(
-                    chain[chain.length - 1].headers["strict-transport-security"]);
+                    last.headers["strict-transport-security"]);
 
             this.results.certificate =
                 TEST.HTTPS.certificateValidity(
-                    chain[chain.length - 1].certificate);
+                    last.certificate);
 
-        })
+        }).then(() => {
+
+            /* HTTP */
+
+            this.results.xXssProtection =
+                TEST.HTTP.xXssProtectionHeader(
+                    last.headers["x-xss-protection"]);
+
+            this.results.xContentTypeOptions =
+                TEST.HTTP.xContentTypeOptions(
+                    last.headers["x-content-type-options"]);
+
+            this.results.xFrameOptions =
+                TEST.HTTP.xFrameOptions(
+                    last.headers["x-frame-options"]);
+
+            this.results.featurePolicy =
+                TEST.HTTP.featurePolicy(
+                    last.headers["feature-policy"]);
+
+            this.results.referrerPolicy =
+                TEST.HTTP.referrerPolicy(
+                    last.headers["referrer-policy"]);
+
+        });
 
     }
 
@@ -201,7 +228,7 @@ async function request(options, data, callback) {
             callback({
                 status,
                 request: options,
-                headers: res.header
+                headers: res.headers
             });
 
             location = parseLocation(location, options);
