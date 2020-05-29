@@ -100,6 +100,24 @@ class WebsiteSecurityScanner {
 
         }).then(() => {
 
+            /* TLS */
+
+            return Promise.all([
+                TEST.TLS.checkProtocols(this.domain)
+
+            ]).then(([ps]) => {
+
+                let result = ps["1.3"] && ps["1.2"] && !ps["1.1"] && !ps["1.0"];
+
+                this.results.tlsProtocols = {
+                    result,
+                    data:ps
+                };
+
+            });
+
+        }).then(() => {
+
             /* HTTPS */
 
             let requests = chain.map(e => e.request);
@@ -110,13 +128,17 @@ class WebsiteSecurityScanner {
             this.results.secureRedirectionChain =
                 TEST.HTTPS.secureRedirectionChain(requests);
 
-            this.results.hsts =
-                TEST.HTTPS.httpStrictTransportSecurity(
-                    last.headers["strict-transport-security"]);
-
             this.results.certificate =
                 TEST.HTTPS.certificateValidity(
                     last.certificate);
+
+            return Promise.all([
+                TEST.HTTPS.httpStrictTransportSecurity(
+                    last.headers["strict-transport-security"], this.domain)
+
+            ]).then(([result]) => {
+                this.results.hsts = result;
+            });
 
         }).then(() => {
 
