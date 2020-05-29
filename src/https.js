@@ -70,9 +70,10 @@ function secureRedirectionChain(chain) {
 /**
  * Test for HTTP Strict Transport Security header.
  * @param {string} header
+ * @param {string} domain
  * @returns {ResultHsts}
  */
-function httpStrictTransportSecurity(header) {
+function httpStrictTransportSecurity(header, domain) {
 
     if (undefined === header) {
         return GENERIC.INVALID_RESULT;
@@ -107,14 +108,30 @@ function httpStrictTransportSecurity(header) {
         return GENERIC.INVALID_RESULT;
     }
 
-    return {
-        result:true,
-        data:{
-            age,
-            includeSubdomains,
-            preload
+    return new Promise((resolve, reject) => {
+
+        let callback = (body) => {
+            body = JSON.parse(body);
+
+            resolve({
+                result:true,
+                data:{
+                    age,
+                    includeSubdomains,
+                    preload,
+                    preloaded:("preloaded" === body.status)
+                }
+            });
         }
-    };
+
+        if (includeSubdomains && preload) {
+            GENERIC.get("https://hstspreload.org/api/v2/status?domain=" + domain, callback);
+
+        } else {
+            callback("{}"); // preloaded will be set to false
+        }
+
+    });
 
 }
 
