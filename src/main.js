@@ -109,7 +109,7 @@ class WebsiteSecurityScanner {
 
             ]).then(([ps]) => {
 
-                let result = ps["1.3"] && ps["1.2"] && !ps["1.1"] && !ps["1.0"];
+                let result = ps["1.3"] && !ps["1.1"] && !ps["1.0"];
 
                 this.results.tlsProtocols = {
                     result,
@@ -146,6 +146,18 @@ class WebsiteSecurityScanner {
 
             /* HTTP */
 
+            this.results.contentSecurityPolicy =
+                TEST.HTTP.contentSecurityPolicy(
+                    last.headers["content-security-policy"]);
+
+            this.results.featurePolicy =
+                TEST.HTTP.featurePolicy(
+                    last.headers["feature-policy"]);
+
+            this.results.referrerPolicy =
+                TEST.HTTP.referrerPolicy(
+                    last.headers["referrer-policy"]);
+
             this.results.xXssProtection =
                 TEST.HTTP.xXssProtectionHeader(
                     last.headers["x-xss-protection"]);
@@ -157,14 +169,6 @@ class WebsiteSecurityScanner {
             this.results.xFrameOptions =
                 TEST.HTTP.xFrameOptions(
                     last.headers["x-frame-options"]);
-
-            this.results.featurePolicy =
-                TEST.HTTP.featurePolicy(
-                    last.headers["feature-policy"]);
-
-            this.results.referrerPolicy =
-                TEST.HTTP.referrerPolicy(
-                    last.headers["referrer-policy"]);
 
             let headers = chain.map(e => e.headers);
             let miscHeaders = TEST.HTTP.miscellaneousHeaders(headers);

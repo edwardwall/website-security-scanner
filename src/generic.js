@@ -125,8 +125,14 @@ function parsePolicy(policy) {
             continue;
         }
 
-        let directive = section.substring(0, section.indexOf(" "));
-        section = section.substring(section.indexOf(" ") + 1);
+        let spaceIndex = section.indexOf(" ");
+        if (-1 === spaceIndex) {
+            result[section] = [];
+            continue;
+        }
+
+        let directive = section.substring(0, spaceIndex);
+        section = section.substring(spaceIndex + 1);
 
         result[directive] = section.split(" ");
 

@@ -1,6 +1,64 @@
 const GENERIC = require("./generic.js");
 
 
+/**
+ * Check Content-Security-Policy header.
+ * @param {string} header
+ * @returns {ResultPolicy}
+ */
+function contentSecurityPolicy(header) {
+
+    if (undefined === header) {
+        return {
+            result:false,
+            data:{}
+        }
+    }
+
+    let data = GENERIC.parsePolicy(header);
+
+    const UNSAFE = [
+        "data: ",
+
+        "http: ",
+        "https: ",
+        "http://* ",
+        "https://* ",
+
+        "'unsafe-eval'",
+        "'unsafe-hashes'",
+        "'unsafe-inline'",
+    ];
+
+    let defaultSrc = data["default-src"];
+    let scriptSrc = data["script-src"];
+    let styleSrc = data["style-src"];
+
+    for (directive of [defaultSrc, scriptSrc, styleSrc]) {
+
+        if (undefined === directive) {
+            continue;
+        }
+
+        for (source of UNSAFE) {
+            if (directive.includes()) {
+                return {
+                    result:false,
+                    data
+                };
+            }
+        }
+
+    }
+
+    return {
+        return:true,
+        data
+    };
+
+}
+
+
  /**
  * @typedef {Result} ResultReferrerPolicy
  * @property {string} data.value
@@ -254,6 +312,7 @@ function miscellaneousHeaders(chain) {
 
 
 module.exports = {
+    contentSecurityPolicy,
     referrerPolicy,
     featurePolicy,
     xContentTypeOptions,
