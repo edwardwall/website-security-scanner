@@ -102,6 +102,8 @@ class WebsiteSecurityScanner {
 
             /* TLS */
 
+            this.results.forwardSecrecy = TEST.TLS.forwardSecrecy(last.cipher);
+
             return Promise.all([
                 TEST.TLS.checkProtocols(this.domain)
 
@@ -244,6 +246,7 @@ async function request(options, data, callback) {
 
             let body = "";
             let certificate = res.socket.getPeerCertificate();
+            let cipher = res.socket.getCipher();
 
             res.on("data", (chunk) => {
                 body += chunk.toString();
@@ -255,6 +258,7 @@ async function request(options, data, callback) {
                     request: options,
                     headers: res.headers,
                     certificate,
+                    cipher,
                     body
                 });
             });

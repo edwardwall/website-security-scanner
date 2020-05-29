@@ -1,4 +1,5 @@
 const TLS = require("tls");
+const GENERIC = require("./generic.js");
 
 
 /**
@@ -58,6 +59,33 @@ async function checkProtocols(host) {
 
 }
 
+
+/**
+ * Check whether server supports Forward Secrecy.
+ * @param {Object} cipher
+ * @returns {Result}
+ */
+function forwardSecrecy(cipher) {
+
+    cipher = cipher.standardName;
+
+    if (cipher.startsWith("TLS_")) { // Using TLS 1.3
+        return GENERIC.VALID_RESULT;
+    }
+
+    for (e of ["dhe, edh", "ecdhe"]) {
+
+        if (cipher.includes(e)) {
+            return GENERIC.VALID_RESULT;
+        }
+    }
+
+    return GENERIC.INVALID_RESULT;
+
+}
+
+
 module.exports = {
-    checkProtocols
+    checkProtocols,
+    forwardSecrecy
 };
