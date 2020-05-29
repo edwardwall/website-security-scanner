@@ -94,6 +94,7 @@ function httpStrictTransportSecurity(header, domain) {
 
             age = directive.substring(directive.indexOf("=") + 1);
             age = parseInt(age);
+            age = GENERIC.secondsToDays(age);
 
         } else if (directive.startsWith("includesubdomains ")) {
             includeSubdomains = true;

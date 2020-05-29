@@ -143,10 +143,23 @@ function parsePolicy(policy) {
 }
 
 
+/**
+ * Convert seconds to days.
+ * @param {number} seconds
+ * @param {number}
+ */
+function secondsToDays(seconds) {
+
+    return Math.floor(seconds / (60*60*24));
+
+}
+
+
 module.exports = {
     INVALID_RESULT,
     VALID_RESULT,
     get,
     checkHeaderKeyValue,
-    parsePolicy
+    parsePolicy,
+    secondsToDays
 };

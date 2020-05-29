@@ -104,8 +104,8 @@ function certificateValidity(certificate) {
     let end   = Date.parse(certificate.valid_to);
 
     let length = end - start;
-    length /= (1000 * 60 * 60 * 24); // covert from miliseconds to days
-    length = Math.floor(length);
+    length /= 1000; // convert miliseconds to seconds
+    length = GENERIC.secondsToDays(length);
 
     return {
         result: (190 >= length), // roughly 6 months
