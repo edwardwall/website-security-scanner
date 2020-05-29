@@ -104,6 +104,9 @@ class WebsiteSecurityScanner {
 
             this.results.forwardSecrecy = TEST.TLS.forwardSecrecy(last.cipher);
 
+            this.results.certificate =
+                TEST.TLS.certificateValidity(last.certificate);
+
             return Promise.all([
                 TEST.TLS.checkProtocols(this.domain)
 
@@ -129,10 +132,6 @@ class WebsiteSecurityScanner {
 
             this.results.secureRedirectionChain =
                 TEST.HTTPS.secureRedirectionChain(requests);
-
-            this.results.certificate =
-                TEST.HTTPS.certificateValidity(
-                    last.certificate);
 
             return Promise.all([
                 TEST.HTTPS.httpStrictTransportSecurity(
