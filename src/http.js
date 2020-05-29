@@ -183,10 +183,81 @@ function xXssProtectionHeader(header) {
 }
 
 
+/**
+ * Check miscellaneous headers.
+ * @param {Object[]} chain
+ * @returns {Object}
+ */
+function miscellaneousHeaders(chain) {
+
+    let asp = [];
+    let server = [];
+    let powered = [];
+
+    for (headers of chain) {
+
+        if (headers["x-aspnet-version"]) {
+            asp.push(headers["x-aspnet-version"]);
+        }
+        if (headers["x-aspnetmvc-version"]) {
+            asp.push(headers["x-aspnetmvc-version"]);
+        }
+
+        if (headers["server"]) {
+            server.push(headers["server"]);
+        }
+
+        if (headers["x-powered-by"]) {
+            powered.push(headers["x-powered-by"]);
+        }
+
+    }
+
+    asp = asp.map(e => e.trim());
+    server = server.map(e => e.trim());
+    powered = powered.map(e => e.trim());
+
+    return {
+        asp: getLongest(asp),
+        server: getLongest(server),
+        powered: getLongest(powered)
+    };
+
+    function getLongest(arr) {
+
+        if (0 === arr.length) {
+            return GENERIC.VALID_RESULT;
+        }
+
+        let longest = "";
+
+        for (elem of arr) {
+            if (elem.length > longest.length) {
+                longest = elem;
+            }
+        }
+
+        if (0 === longest.length) {
+            return GENERIC.VALID_RESULT;
+        } else {
+            return {
+                result:false,
+                data:{
+                    value:longest
+                }
+            };
+        }
+
+    }
+
+}
+
+
 module.exports = {
     referrerPolicy,
     featurePolicy,
     xContentTypeOptions,
     xFrameOptions,
-    xXssProtectionHeader
+    xXssProtectionHeader,
+    miscellaneousHeaders
 }

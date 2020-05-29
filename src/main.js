@@ -166,6 +166,13 @@ class WebsiteSecurityScanner {
                 TEST.HTTP.referrerPolicy(
                     last.headers["referrer-policy"]);
 
+            let headers = chain.map(e => e.headers);
+            let miscHeaders = TEST.HTTP.miscellaneousHeaders(headers);
+
+            this.results.server = miscHeaders.server;
+            this.results.poweredBy = miscHeaders.powered;
+            this.results.aspVersion = miscHeaders.asp;
+
         });
 
     }
