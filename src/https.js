@@ -35,7 +35,7 @@ function upgradeToHttps(chain) {
 function secureRedirectionChain(chain) {
 
     if (0 === chain.length) {
-        throw Error("Chain cannot be empty.");
+        return GENERIC.INVALID_RESULT;
 
     } else if (1 === chain.length) {
         // Do nothing.
