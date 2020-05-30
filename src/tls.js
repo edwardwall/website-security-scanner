@@ -49,7 +49,11 @@ async function checkProtocols(host) {
                 }).on("error", (err) => {
                     socket.destroy();
                     reject();
+                }).on("timeout", (err) => {
+                    socket.destroy();
+                    reject();
                 });
+                socket.setTimeout(10000); // 10 seconds
             } catch (err) {
                 reject();
             }
@@ -104,7 +108,7 @@ function certificateValidity(certificate) {
     let end   = Date.parse(certificate.valid_to);
 
     let length = end - start;
-    length /= 1000; // convert miliseconds to seconds
+    length /= 1000; // convert milliseconds to seconds
     length = GENERIC.secondsToDays(length);
 
     return {
