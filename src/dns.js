@@ -31,7 +31,7 @@ async function caa(domain) {
 
 
 /**
- * Check DNS Secure Extensions (DNSSEC).
+ * Check DNS Security Extensions (DNSSEC).
  * @param {string} domain
  * @returns {Result}
  */

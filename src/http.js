@@ -34,7 +34,29 @@ function contentSecurityPolicy(header) {
     let scriptSrc = data["script-src"];
     let styleSrc = data["style-src"];
 
-    for (directive of [defaultSrc, scriptSrc, styleSrc]) {
+    // No protection
+    if (!defaultSrc &&
+        !(scriptSrc && styleSrc)) {
+
+        return {
+            result:false,
+            data
+        }
+    }
+
+    let check = [];
+
+    if (scriptSrc) {
+        check.push(scriptSrc);
+    }
+    if (styleSrc) {
+        check.push(styleSrc);
+    }
+    if (2 > check.length) {
+        check.push(defaultSrc);
+    }
+
+    for (directive of check) {
 
         if (undefined === directive) {
             continue;
