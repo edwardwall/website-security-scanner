@@ -40,6 +40,8 @@ function contentSecurityPolicy(header) {
             continue;
         }
 
+        directive += " ";
+
         for (source of UNSAFE) {
             if (directive.includes()) {
                 return {
@@ -52,7 +54,7 @@ function contentSecurityPolicy(header) {
     }
 
     return {
-        return:true,
+        result:true,
         data
     };
 
