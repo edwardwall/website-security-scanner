@@ -11,6 +11,8 @@ const TEST = {
     HTTPS: require("./https.js")
 };
 
+const GENERIC = require("./generic.js");
+
 
 class WebsiteSecurityScanner {
 
@@ -58,123 +60,145 @@ class WebsiteSecurityScanner {
      */
     scan() {
 
-        let chain;
-        let last;
+        return new Promise((resolve, reject) => {
 
-        Promise.allSettled([
-            followChain("http:", this.domain),
-            followChain("https:",this.domain)
+            let chain;
+            let last;
+            let secondChain = [];
 
-        ]).then(([http, https]) => {
+            Promise.allSettled([
+                followChain("http:", this.domain),
+                followChain("https:",this.domain)
 
-            if ("rejected" === http.status &&
-                "rejected" === https.status) {
+            ]).then(([http, https]) => {
 
-                throw Error("Both promises rejected.");
+                if ("rejected" === http.status &&
+                    "rejected" === https.status) {
 
-            } else if ("rejected" === http.status) {
-                chain = https.value;
+                    throw Error(this.domain + " cannot be accessed by HTTP or HTTPS");
 
-            } else if ("rejected" === https.status) {
-                chain = http.value;
+                } else if ("rejected" === http.status) {
+                    chain = https.value;
 
-            } else { // Both fulfilled
-                chain = http.value; // use HTTP as default
-            }
+                } else if ("rejected" === https.status) {
+                    chain = http.value;
 
-            last = chain[chain.length - 1];
+                } else { // Both fulfilled
+                    chain = http.value; // use HTTP as default
+                    secondChain = https.value;
+                }
 
-        }).then(() => {
+                last = chain[chain.length - 1];
 
-            /* DNS */
+                this.results.accepts = {
+                    http: ("fulfilled" === http.status),
+                    https:("fulfilled" === https.status)
+                }
 
-            return Promise.all([
-                TEST.DNS.caa(this.domain),
-                TEST.DNS.dnssec(this.domain)
+            }).then(() => {
 
-            ]).then(([caa, dnssec]) => {
+                /* DNS */
 
-                this.results.caa = caa;
-                this.results.dnssec = dnssec;
+                return Promise.all([
+                    TEST.DNS.caa(this.domain),
+                    TEST.DNS.dnssec(this.domain)
+
+                ]).then(([caa, dnssec]) => {
+
+                    this.results.caa = caa;
+                    this.results.dnssec = dnssec;
+                });
+
+            }).then(() => {
+
+                /* TLS */
+
+                this.results.forwardSecrecy = TEST.TLS.forwardSecrecy(last.cipher);
+
+                this.results.certificate =
+                    TEST.TLS.certificateValidity(last.certificate);
+
+                return Promise.all([
+                    TEST.TLS.checkProtocols(this.domain)
+
+                ]).then(([ps]) => {
+
+                    let result = ps["1.3"] && !ps["1.1"] && !ps["1.0"];
+
+                    this.results.tlsProtocols = {
+                        result,
+                        data:ps
+                    };
+
+                });
+
+            }).then(() => {
+
+                /* HTTPS */
+
+                let requests = chain.map(e => e.request);
+                let secondRequests = chain.map(e => e.request);
+
+                this.results.upgradeToHttps =
+                    (this.results.accepts.http ?
+                        TEST.HTTPS.upgradeToHttps(requests) :
+                        GENERIC.INVALID_RESULT
+                    );
+
+                this.results.secureRedirectionChain =
+                    ((this.results.accepts.http && this.results.accepts.https &&
+                    TEST.HTTPS.secureRedirectionChain(requests) &&
+                    TEST.HTTPS.secureRedirectionChain(secondRequests)) ?
+                        GENERIC.VALID_RESULT :
+                        GENERIC.INVALID_RESULT
+                    );
+
+                return Promise.all([
+                    TEST.HTTPS.httpStrictTransportSecurity(
+                        last.headers["strict-transport-security"], this.domain)
+
+                ]).then(([result]) => {
+                    this.results.hsts = result;
+                });
+
+            }).then(() => {
+
+                /* HTTP */
+
+                this.results.contentSecurityPolicy =
+                    TEST.HTTP.contentSecurityPolicy(
+                        last.headers["content-security-policy"]);
+
+                this.results.featurePolicy =
+                    TEST.HTTP.featurePolicy(
+                        last.headers["feature-policy"]);
+
+                this.results.referrerPolicy =
+                    TEST.HTTP.referrerPolicy(
+                        last.headers["referrer-policy"]);
+
+                this.results.xXssProtection =
+                    TEST.HTTP.xXssProtectionHeader(
+                        last.headers["x-xss-protection"]);
+
+                this.results.xContentTypeOptions =
+                    TEST.HTTP.xContentTypeOptions(
+                        last.headers["x-content-type-options"]);
+
+                this.results.xFrameOptions =
+                    TEST.HTTP.xFrameOptions(
+                        last.headers["x-frame-options"]);
+
+                let headers = chain.map(e => e.headers);
+                let miscHeaders = TEST.HTTP.miscellaneousHeaders(headers);
+
+                this.results.server = miscHeaders.server;
+                this.results.poweredBy = miscHeaders.powered;
+                this.results.aspVersion = miscHeaders.asp;
+
+            }).then(() => {
+                resolve(this.results);
             });
-
-        }).then(() => {
-
-            /* TLS */
-
-            this.results.forwardSecrecy = TEST.TLS.forwardSecrecy(last.cipher);
-
-            this.results.certificate =
-                TEST.TLS.certificateValidity(last.certificate);
-
-            return Promise.all([
-                TEST.TLS.checkProtocols(this.domain)
-
-            ]).then(([ps]) => {
-
-                let result = ps["1.3"] && !ps["1.1"] && !ps["1.0"];
-
-                this.results.tlsProtocols = {
-                    result,
-                    data:ps
-                };
-
-            });
-
-        }).then(() => {
-
-            /* HTTPS */
-
-            let requests = chain.map(e => e.request);
-
-            this.results.upgradeToHttps =
-                TEST.HTTPS.upgradeToHttps(requests);
-
-            this.results.secureRedirectionChain =
-                TEST.HTTPS.secureRedirectionChain(requests);
-
-            return Promise.all([
-                TEST.HTTPS.httpStrictTransportSecurity(
-                    last.headers["strict-transport-security"], this.domain)
-
-            ]).then(([result]) => {
-                this.results.hsts = result;
-            });
-
-        }).then(() => {
-
-            /* HTTP */
-
-            this.results.contentSecurityPolicy =
-                TEST.HTTP.contentSecurityPolicy(
-                    last.headers["content-security-policy"]);
-
-            this.results.featurePolicy =
-                TEST.HTTP.featurePolicy(
-                    last.headers["feature-policy"]);
-
-            this.results.referrerPolicy =
-                TEST.HTTP.referrerPolicy(
-                    last.headers["referrer-policy"]);
-
-            this.results.xXssProtection =
-                TEST.HTTP.xXssProtectionHeader(
-                    last.headers["x-xss-protection"]);
-
-            this.results.xContentTypeOptions =
-                TEST.HTTP.xContentTypeOptions(
-                    last.headers["x-content-type-options"]);
-
-            this.results.xFrameOptions =
-                TEST.HTTP.xFrameOptions(
-                    last.headers["x-frame-options"]);
-
-            let headers = chain.map(e => e.headers);
-            let miscHeaders = TEST.HTTP.miscellaneousHeaders(headers);
-
-            this.results.server = miscHeaders.server;
-            this.results.poweredBy = miscHeaders.powered;
-            this.results.aspVersion = miscHeaders.asp;
 
         });
 
@@ -205,11 +229,11 @@ function followChain(protocol, hostname) {
         let callback = (result) => {
             if (undefined === result) {
                 reject();
-            }
-
-            chain.push(result);
-            if (300 > result.status) {
-                resolve(chain);
+            } else {
+                chain.push(result);
+                if (300 > result.status) {
+                    resolve(chain);
+                }
             }
         }
 
@@ -225,6 +249,7 @@ async function request(options, data, callback) {
 
     options.agent = false;
     options.headers = {};
+    options.timeout = 10000; // 10 second timeout for request
 
     data.chainLength += 1;
     if (8 < data.chainLength) {
@@ -236,10 +261,10 @@ async function request(options, data, callback) {
         cookies.push(key + "=" + data.cookies[key]);
     }
 
-    options.headers.cookies = cookies.join("; ");
+    options.headers.cookie = cookies.join("; ");
     options.headers["user-agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/537.36";
 
-    ("https:" === options.protocol ? NODE.HTTPS : NODE.HTTP).get(options, (res) => {
+    let requestObject = ("https:" === options.protocol ? NODE.HTTPS : NODE.HTTP).get(options, (res) => {
 
         let location;
         try {
@@ -255,8 +280,13 @@ async function request(options, data, callback) {
         if (300 > status) { // Success
 
             let body = "";
-            let certificate = res.socket.getPeerCertificate();
-            let cipher = res.socket.getCipher();
+            let certificate;
+            let cipher;
+
+            if ("https:" === options.protocol) {
+                certificate = res.socket.getPeerCertificate();
+                cipher = res.socket.getCipher();
+            }
 
             res.on("data", (chunk) => {
                 body += chunk.toString();
@@ -293,12 +323,13 @@ async function request(options, data, callback) {
             request(nextOptions, data, callback);
 
         } else { // Error
-
             callback(undefined);
-
         }
 
     }).on("error", (err) => {
+        callback(undefined);
+    }).on("timeout", () => {
+        requestObject.destroy();
         callback(undefined);
     });
 
