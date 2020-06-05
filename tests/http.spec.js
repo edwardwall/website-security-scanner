@@ -223,3 +223,60 @@ describe("Check xXssProtectionHeader()", () => {
     });
 
 });
+
+
+describe("Check miscellaneousHeaders()", () => {
+
+    test("single headers", () => {
+
+        expect(HTTP.miscellaneousHeaders([
+            {server:"1"},
+            {server:"123"},
+            {server:"12"},
+            {}
+        ])).toEqual({
+            asp:GENERIC.VALID_RESULT,
+            powered:GENERIC.VALID_RESULT,
+            server: {
+                result: false,
+                data: {
+                    value: "123"
+                }
+            }
+        });
+
+        expect(HTTP.miscellaneousHeaders([
+            {"x-powered-by":"123"},
+            {"x-powered-by":"1"},
+            {},
+            {"x-powered-by":"12"}
+        ])).toEqual({
+            asp:GENERIC.VALID_RESULT,
+            server:GENERIC.VALID_RESULT,
+            powered: {
+                result: false,
+                data: {
+                    value: "123"
+                }
+            }
+        });
+
+        expect(HTTP.miscellaneousHeaders([
+            {},
+            {"x-aspnet-version":"1", "x-aspnetmvc-version":"123"},
+            {"x-aspnet-version":"12"},
+            {"x-aspnetmvc-version":"12"}
+        ])).toEqual({
+            server:GENERIC.VALID_RESULT,
+            powered:GENERIC.VALID_RESULT,
+            asp: {
+                result: false,
+                data: {
+                    value: "123"
+                }
+            }
+        });
+
+    });
+
+});
