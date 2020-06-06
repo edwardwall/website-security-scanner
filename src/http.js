@@ -211,6 +211,8 @@ function xFrameOptions(header) {
     let valid = false;
 
     for (directive of header.split(";")) {
+        directive = directive.trim();
+
         if ("deny" === directive ||
             "sameorigin" === directive) {
 
