@@ -19,7 +19,7 @@ describe("Check certificateValidity()", () => {
         expect(TLS.certificateValidity({
             valid_from:"01 January 2020 01:00:00",
             valid_to:  "01 February 2020 01:00:00"
-        })).toBe({
+        })).toEqual({
             results:false,
             data:{
                 length:31
@@ -29,7 +29,7 @@ describe("Check certificateValidity()", () => {
         expect(TLS.certificateValidity({
             valid_from:"01 January 2020 01:00:00",
             valid_to:  "01 July 2020 01:00:00"
-        })).toBe({
+        })).toEqual({
             results:true,
             data:{
                 length:(31+29+31+30+31+30)
@@ -39,12 +39,19 @@ describe("Check certificateValidity()", () => {
         expect(TLS.certificateValidity({
             valid_from:"01 January 2020 01:00:00",
             valid_to:  "01 January 2021 01:00:00"
-        })).toBe({
+        })).toEqual({
             results:true,
             data:{
                 length:366 // Leap year
             }
         });
+
+    });
+
+    test("invalid values", () => {
+
+        expect(TLS.certificateValidity(undefined)
+            .toEqual(GENERIC.INVALID_RESULT);
 
     });
 
