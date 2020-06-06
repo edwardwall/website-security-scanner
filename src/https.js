@@ -19,9 +19,9 @@ function upgradeToHttps(chain) {
 
     if ("https:" === chain[1].protocol) {
         return GENERIC.VALID_RESULT;
-    } else {
-        return GENERIC.INVALID_RESULT;
     }
+
+    return GENERIC.INVALID_RESULT;
 
 }
 
@@ -54,9 +54,9 @@ function secureRedirectionChain(chain) {
 
     if (secure) {
         return GENERIC.VALID_RESULT;
-    } else {
-        return GENERIC.INVALID_RESULT;
     }
+
+    return GENERIC.INVALID_RESULT;
 
 }
 
