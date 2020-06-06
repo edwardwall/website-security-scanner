@@ -9,6 +9,10 @@ const GENERIC = require("./generic.js");
  */
 async function checkProtocols(host) {
 
+    if (undefined === host || "" === host) {
+        throw Error("Host must be defined.");
+    }
+
     return Promise.allSettled([
         checkProtocol("TLSv1.3"),
         checkProtocol("TLSv1.2"),
@@ -38,7 +42,8 @@ async function checkProtocols(host) {
                 host,
                 port:443,
                 minVersion:protocol,
-                maxVersion:protocol
+                maxVersion:protocol,
+                servername: host
             };
 
             try {
