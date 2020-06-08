@@ -74,9 +74,9 @@ async function checkProtocols(host) {
  */
 function forwardSecrecy(cipher) {
 
-    cipher = cipher.standardName;
+    cipher = cipher.name.toLowerCase();;
 
-    if (cipher.startsWith("TLS_")) { // Using TLS 1.3
+    if (cipher.startsWith("tls_")) { // Using TLS 1.3
         return GENERIC.VALID_RESULT;
     }
 
