@@ -4,38 +4,32 @@ const GENERIC = require("./generic.js")
 /**
  * Check DNS Certification Authority Authorization (CAA).
  * @param {string} domain
- * @returns {Result}
+ * @returns {Promise}
  */
 async function caa(domain) {
 
-    return new Promise((resolve, reject) => {
-
-        let callback = (body) => {
-            body = JSON.parse(body);
-
-            if (body.Answer) {
-                resolve(GENERIC.VALID_RESULT);
-            } else {
-                resolve(GENERIC.INVALID_RESULT);
-            }
-        }
-
-        GENERIC.get(
-            "https://dns.google.com/resolve?type=CAA&dnssec=true&name=" + domain,
-            callback
-        );
-
-    });
+    return dnsLookup(domain, "CAA");
 
 }
-
 
 /**
  * Check DNS Security Extensions (DNSSEC).
  * @param {string} domain
- * @returns {Result}
+ * @returns {Promise}
  */
-async function dnssec(domain, callback) {
+async function dnssec(domain) {
+
+    return dnsLookup(domain, "DS");
+
+}
+
+/**
+ * Private function to perform DNS lookup.
+ * @param {string} domain
+ * @param {string} type
+ * @returns {Promise}
+ */
+async function dnsLookup(domain, type) {
 
     return new Promise((resolve, reject) => {
 
@@ -44,20 +38,18 @@ async function dnssec(domain, callback) {
 
             if (body.Answer) {
                 resolve(GENERIC.VALID_RESULT);
-            } else {
-                resolve(GENERIC.INVALID_RESULT);
             }
+            resolve(GENERIC.INVALID_RESULT);
         }
 
-        GENERIC.get(
-            "https://dns.google.com/resolve?type=DS&dnssec=true&name=" + domain,
-            callback
-        );
+        let url = "https://dns.google.com/resolve?dnssec=true" +
+            "&type=" + type + "&name=" + domain;
+
+        GENERIC.get(url, callback);
 
     });
 
 }
-
 
 module.exports = {
     caa,
