@@ -40,7 +40,6 @@ describe("Check checkHeaderKeyValue()", () => {
 
 });
 
-
 describe("Check parsePolicy()", () => {
 
     test("malformed policies", () => {
@@ -63,6 +62,20 @@ describe("Check parsePolicy()", () => {
                     "http:"
                 ]
             });
+
+    });
+
+});
+
+describe("Check secondsToDays()", () => {
+
+    test("correct conversion", () => {
+
+        expect(GENERIC.secondsToDays(86400)).toBe(1);
+
+        expect(GENERIC.secondsToDays(8640000)).toBe(100);
+
+        expect(GENERIC.secondsToDays(31536000)).toBe(365);
 
     });
 

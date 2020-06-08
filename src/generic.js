@@ -1,4 +1,5 @@
-const HTTPS = require("https")
+const URL = require("url");
+const HTTPS = require("https");
 
 const INVALID_RESULT = {result:false};
 const VALID_RESULT   = {result:true};
@@ -21,9 +22,22 @@ const VALID_RESULT   = {result:true};
 
 
 /**
+ * Callback for async tests to store result.
+ * @callback CallbackResult
+ * @param {Result} result
+ */
+
+/**
+ * Callback for analysing result from generic get().
+ * @callback CallbackAnalyse
+ * @param {string} body
+ */
+
+
+/**
  * Function to make a generic HTTPS GET request.
  * @param {string} url
- * @param {function} callback
+ * @param {CallbackAnalyse} callback
  */
 async function get(url, callback) {
 
@@ -36,7 +50,7 @@ async function get(url, callback) {
         });
 
         res.on("end", () => {
-            callback(res.headers, body);
+            callback(body);
         });
 
     }).on("error", (err) => {
@@ -107,8 +121,18 @@ function parsePolicy(policy) {
 
         section = section.trim();
 
-        let directive = section.substring(0, section.indexOf(" "));
-        section = section.substring(section.indexOf(" ") + 1);
+        if ("" === section) {
+            continue;
+        }
+
+        let spaceIndex = section.indexOf(" ");
+        if (-1 === spaceIndex) {
+            result[section] = [];
+            continue;
+        }
+
+        let directive = section.substring(0, spaceIndex);
+        section = section.substring(spaceIndex + 1);
 
         result[directive] = section.split(" ");
 
@@ -119,10 +143,23 @@ function parsePolicy(policy) {
 }
 
 
+/**
+ * Convert seconds to days.
+ * @param {number} seconds
+ * @param {number}
+ */
+function secondsToDays(seconds) {
+
+    return Math.floor(seconds / (60*60*24));
+
+}
+
+
 module.exports = {
     INVALID_RESULT,
     VALID_RESULT,
     get,
     checkHeaderKeyValue,
-    parsePolicy
+    parsePolicy,
+    secondsToDays
 };
