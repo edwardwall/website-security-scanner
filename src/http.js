@@ -57,22 +57,24 @@ function contentSecurityPolicy(header) {
     }
 
     for (directive of check) {
+        for (origin of directive) {
 
-        if (undefined === directive) {
-            continue;
-        }
-
-        directive += " ";
-
-        for (source of UNSAFE) {
-            if (directive.includes()) {
-                return {
-                    result:false,
-                    data
-                };
+            if (undefined === origin) {
+                continue;
             }
-        }
 
+            origin += " ";
+
+            for (source of UNSAFE) {
+                if (origin.includes(source)) {
+                    return {
+                        result:false,
+                        data
+                    };
+                }
+            }
+
+        }
     }
 
     return {
@@ -149,8 +151,7 @@ function featurePolicy(header) {
         "display-capture",
         "geolocation",
         "microphone",
-        "payment",
-        "publickey-credentials-get"
+        "payment"
     ];
 
     let safe = true;
@@ -158,7 +159,8 @@ function featurePolicy(header) {
     for (directive of DIRECTIVES) {
 
         if (undefined === data[directive]) {
-            continue;
+            safe = false;
+            break;
         }
 
         for (elem of data[directive]) {
@@ -167,6 +169,7 @@ function featurePolicy(header) {
 
             if ("*" === elem || elem.startsWith("http:")) {
                 safe = false;
+                break;
             }
         }
     }
