@@ -5,7 +5,7 @@ const GENERIC = require("./generic.js");
 /**
  * Check which TLS Protocols are enabled.
  * @param {string} host
- * @param {Object}
+ * @returns {Promise}
  */
 async function checkProtocols(host) {
 
@@ -29,7 +29,6 @@ async function checkProtocols(host) {
         };
 
     });
-
 
     /**
      * Private function to check specific protocol.
@@ -68,7 +67,6 @@ async function checkProtocols(host) {
 
 }
 
-
 /**
  * Check whether server supports Forward Secrecy.
  * @param {Object} cipher
@@ -83,7 +81,6 @@ function forwardSecrecy(cipher) {
     }
 
     for (e of ["dhe", "edh", "ecdhe"]) {
-
         if (cipher.includes(e)) {
             return GENERIC.VALID_RESULT;
         }
@@ -92,7 +89,6 @@ function forwardSecrecy(cipher) {
     return GENERIC.INVALID_RESULT;
 
 }
-
 
 /**
  * @typedef {Result} ResultCertificate
@@ -124,7 +120,6 @@ function certificateValidity(certificate) {
     };
 
 }
-
 
 module.exports = {
     checkProtocols,

@@ -5,7 +5,7 @@ const GENERIC = require("./generic.js");
  * Test whether the server immediately upgrades to HTTPS.
  * @param {URL[]} chain
  * @returns {Result}
- * @throws If first request is HTTPS
+ * @throws If first request is HTTPS.
  */
 function upgradeToHttps(chain) {
 
@@ -14,7 +14,7 @@ function upgradeToHttps(chain) {
     }
 
     if ("https:" === chain[0].protocol) {
-        throw "First URL should be HTTP";
+        throw Error("First URL should be HTTP");
     }
 
     if ("https:" === chain[1].protocol) {
@@ -24,7 +24,6 @@ function upgradeToHttps(chain) {
     return GENERIC.INVALID_RESULT;
 
 }
-
 
 /**
  * Test whether the server redirects through secure connections.
@@ -36,10 +35,8 @@ function secureRedirectionChain(chain) {
 
     if (0 === chain.length) {
         return GENERIC.INVALID_RESULT;
-
     } else if (1 === chain.length) {
         // Do nothing.
-
     } else {
         chain.shift(); // Remove first element.
     }
@@ -59,7 +56,6 @@ function secureRedirectionChain(chain) {
     return GENERIC.INVALID_RESULT;
 
 }
-
 
 /**
  * @typedef {Result} ResultHsts
@@ -85,9 +81,9 @@ function httpStrictTransportSecurity(header, domain) {
     let includeSubdomains = false;
     let preload = false;
 
-    for (i = 0; i < header.length; i++) {
+    for (directive of header) {
 
-        let directive = header[i].trim() + " ";
+        directive = directive.trim() + " ";
 
         if (directive.startsWith("max-age") &&
             directive.replace(/ /g, "").startsWith("max-age=")) {
@@ -135,7 +131,6 @@ function httpStrictTransportSecurity(header, domain) {
     });
 
 }
-
 
 module.exports = {
     upgradeToHttps,

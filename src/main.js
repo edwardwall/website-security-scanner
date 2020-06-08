@@ -60,6 +60,10 @@ class WebsiteSecurityScanner {
      */
     scan() {
 
+        if (0 === Object.keys(this.results).length) {
+            throw Error("Already scanned.");
+        }
+
         return new Promise((resolve, reject) => {
 
             let chain;
@@ -243,8 +247,6 @@ function followChain(protocol, hostname) {
 
 }
 
-
-
 async function request(options, data, callback) {
 
     options.agent = false;
@@ -335,9 +337,8 @@ async function request(options, data, callback) {
 
 }
 
-
 /**
- * Parse Location header returned as HTTP redirect.
+ * Parse Location header returned in HTTP redirect.
  * @param {string} location
  * @param {Object} options
  * @returns {string}
