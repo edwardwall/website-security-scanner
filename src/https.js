@@ -67,7 +67,7 @@ function secureRedirectionChain(chain) {
  * Test for HTTP Strict Transport Security header.
  * @param {string} header
  * @param {string} domain
- * @returns {ResultHsts}
+ * @returns {Result|Promise}
  */
 function httpStrictTransportSecurity(header, domain) {
 
@@ -121,7 +121,7 @@ function httpStrictTransportSecurity(header, domain) {
             });
         }
 
-        if (includeSubdomains && preload) {
+        if (includeSubdomains && preload && (age >= 365)) {
             GENERIC.get("https://hstspreload.org/api/v2/status?domain=" + domain, callback);
 
         } else {
