@@ -60,7 +60,7 @@ class WebsiteSecurityScanner {
      */
     scan() {
 
-        if (0 === Object.keys(this.results).length) {
+        if (0 !== Object.keys(this.results).length) {
             throw Error("Already scanned.");
         }
 
