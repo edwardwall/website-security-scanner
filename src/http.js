@@ -159,8 +159,7 @@ function featurePolicy(header) {
     for (directive of DIRECTIVES) {
 
         if (undefined === data[directive]) {
-            safe = false;
-            break;
+            continue;
         }
 
         for (elem of data[directive]) {
