@@ -126,13 +126,13 @@ describe("Check featurePolicy()", () => {
 
     test("unsafe headers", () => {
 
-        expect(HTTP.featurePolicy("camera https://example.com 'self'"))
+        expect(HTTP.featurePolicy("camera https://example.com http://example.com"))
             .toEqual({
                 result:false,
                 data:{
                     camera:[
                         "https://example.com",
-                        "'self'"
+                        "http://example.com"
                     ]
                 }
             });
